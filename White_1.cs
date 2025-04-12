@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +22,6 @@ namespace Lab_7
             public static int Jumpers => _activeParticipants;
             public static int Disqualified => _disqualifiedParticipants;
 
-            
             static Participant()
             {
                 _standard = 5;
@@ -51,12 +50,12 @@ namespace Lab_7
             public Participant(string surname, string club)
             {
                 _surname = surname;
-                _surname = surname;
                 _club = club;
                 _firstJump = 0;
                 _secondJump = 0;
-                _activeParticipants ++; 
+                _activeParticipants++;
             }
+
             public void Jump(double result)
             {
                 if (_firstJump == 0)
@@ -69,8 +68,6 @@ namespace Lab_7
                 }
             }
 
-
-
             public static void Sort(Participant[] array)
             {
                 if (array == null || array.Length == 0) return;
@@ -81,16 +78,14 @@ namespace Lab_7
                     {
                         if (array[j].JumpSum < array[j + 1].JumpSum)
                         {
-                            // Обмен местами
                             Participant temp = array[j];
                             array[j] = array[j + 1];
                             array[j + 1] = temp;
                         }
                     }
                 }
-
-
             }
+
             public static void Disqualify(ref Participant[] participants)
             {
                 for (int i = 0; i < participants.Length; i++)
@@ -103,15 +98,15 @@ namespace Lab_7
                     }
                 }
 
-                // Удаление null элементов из массива
                 participants = participants.Where(p => p != null).ToArray();
             }
-        
 
-        public void Print()
+            public void Print()
             {
                 Console.WriteLine($"Фамилия: {_surname}, Клуб: {_club}, Первый прыжок: {_firstJump}, Второй прыжок: {_secondJump}, Сумма: {JumpSum}");
             }
         }
     }
+
+
 }
