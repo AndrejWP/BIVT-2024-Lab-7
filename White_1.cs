@@ -15,13 +15,13 @@ namespace Lab_7
             private double _firstJump;
             private double _secondJump;
 
-            private static double _standard = 5;
-            private static int _activeParticipants = 0;
-            private static int _disqualifiedParticipants = 0;
+            private static double _standard ;
+            private static int _activeParticipants;
+            private static int _disqualifiedParticipants;
 
             public static int Jumpers => _activeParticipants;
             public static int Disqualified => _disqualifiedParticipants;
-
+ 
             static Participant()
             {
                 _standard = 5;
@@ -47,6 +47,12 @@ namespace Lab_7
             public double SecondJump => _secondJump;
             public double JumpSum => _firstJump + _secondJump;
 
+            public Participant()
+            {
+                _standard = 5;
+                _activeParticipants = 0;
+                _disqualifiedParticipants = 0;
+            }
             public Participant(string surname, string club)
             {
                 _surname = surname;
@@ -55,7 +61,6 @@ namespace Lab_7
                 _secondJump = 0;
                 _activeParticipants++;
             }
-
             public void Jump(double result)
             {
                 if (_firstJump == 0)
@@ -88,17 +93,37 @@ namespace Lab_7
 
             public static void Disqualify(ref Participant[] participants)
             {
+                if (participants == null || participants.Length == 0) return;
+
+                int count = 0;
+
+                
                 for (int i = 0; i < participants.Length; i++)
                 {
-                    if (participants[i] != null && (participants[i].FirstJump < _standard || participants[i].SecondJump < _standard))
+                    if (participants[i].FirstJump >= _standard && participants[i].SecondJump >= _standard)
                     {
-                        participants[i] = null;
-                        _disqualifiedParticipants++;
-                        _activeParticipants--;
+                        count++;
+                    }
+                    else
+                    {
+                        _disqualifiedParticipants++; 
                     }
                 }
 
-                participants = participants.Where(p => p != null).ToArray();
+                
+                Participant[] newParticipants = new Participant[count];
+                int index = 0;
+
+                for (int i = 0; i < participants.Length; i++)
+                {
+                    if (participants[i].FirstJump >= _standard && participants[i].SecondJump >= _standard)
+                    {
+                        newParticipants[index++] = participants[i];
+                        index++;
+                    }
+                }
+                _activeParticipants = count; 
+                participants = newParticipants; 
             }
 
             public void Print()
