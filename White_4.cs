@@ -13,8 +13,8 @@ namespace Lab_7
             protected string _name;
             protected string _surname;
 
-            public string Surname => _surname ?? default;
-            public string Name => _name ?? default;
+            public string Surname => _surname;
+            public string Name => _name;
 
             public Human(string name, string surname)
             {
@@ -22,7 +22,7 @@ namespace Lab_7
                 _surname = surname;
             }
 
-            public virtual void Print()
+            public  void Print()
             {
                 Console.WriteLine($"Имя: {_name}, Фамилия: {_surname}");
             }
@@ -30,52 +30,102 @@ namespace Lab_7
 
         public class Participant : Human
         {
-            private double[] _scores;
             private static int _count;
-
+            
             public static int Count => _count;
-            public double[] Scores => _scores?.ToArray() ?? Array.Empty<double>();
-            public double TotalScore => _scores?.Sum() ?? 0;
-
-            static Participant() => _count = 0;
+            
+            private double[] _scores;
+            
+            static Participant()
+            {
+                _count = 0;
+            }
 
             public Participant(string name, string surname) : base(name, surname)
             {
-                _scores = Array.Empty<double>();
+                _scores = new double[0];
                 _count++;
             }
-
-            public void PlayMatch(double result)
+            public double[] Scores
             {
-                Array.Resize(ref _scores, _scores.Length + 1);
-                _scores[^1] = result; // Используем индекс от конца
-            }
-
-            public static void Sort(Participant[] array)
-            {
-                if (array == null || array.Length < 2) return;
-
-                for (int i = 0; i < array.Length - 1; i++)
+                get
                 {
-                    bool swapped = false;
-                    for (int j = 0; j < array.Length - 1 - i; j++)
+                    if (_scores == null)
+                        return null;
+                    double[] copyscores = new double[_scores.Length];
+                    for (int i = 0; i < _scores.Length; i++)
                     {
-                        if (array[j].TotalScore >= array[j + 1].TotalScore) continue;
-
-                        (array[j], array[j + 1]) = (array[j + 1], array[j]);
-                        swapped = true;
+                        copyscores[i] = _scores[i];
                     }
-                    if (!swapped) break;
+                    return copyscores;
+                }
+            }
+            private double Average
+            {
+                get
+                {
+                    if (_scores == null || _scores.Length == 0)
+                        return 0;
+                    double sum = 0;
+                    foreach (var score in _scores)
+                    {
+                        sum += score;
+                    }
+                    return sum / _scores.Length;
+                }
+            }
+            public double TotalScore
+            {
+                get
+                {
+                    double sum = 0;
+                    if (_scores == null || _scores.Length == 0)
+                        return 0;
+                    foreach (var score in _scores)
+                    {
+                        sum += score;
+                    }
+                    return sum;
                 }
             }
 
-            public override void Print()
+            
+            public void Print()
             {
-                base.Print();
-                Console.WriteLine($"Очки: {TotalScore:F1}");
+                Console.WriteLine($"Имя: {Name}, Фамилия: {Surname}, Очки: {TotalScore:F1}");
+            }
+            public void PlayMatch(double result)
+            {
+                if (_scores == null) return;
+                double[] newScores = new double[_scores.Length + 1];
+                for (int i = 0; i < _scores.Length; i++)
+                {
+                    newScores[i] = _scores[i];
+                }
+                newScores[newScores.Length - 1] = result;
+                _scores = newScores;
+            }
+            // метод сортировки
+            public static void Sort(Participant[] array)
+            {
+                if (array == null || array.Length == 0) return;
+                int n = array.Length;
+                bool sw;
+                for (int i = 0; i < n - 1; i++)
+                {
+                    sw = false;
+
+                    for (int j = 0; j < n - 1 - i; j++)
+                    {
+                        if (array[j].TotalScore < array[j + 1].TotalScore)
+                        {
+                            (array[j], array[j + 1]) = (array[j + 1], array[j]);
+                            sw = true;
+                        }
+                    }
+                    if (!sw) break;
+                }
             }
         }
     }
-
-   
 }
