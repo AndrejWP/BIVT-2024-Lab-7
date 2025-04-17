@@ -11,31 +11,28 @@ namespace Lab_7
     {
         public class Participant
         {
+        
             private string _surname;
             private string _name;
             private double _firstJump;
             private double _secondJump;
-            private static readonly double _standard;
+
+           
+            private static readonly double _normative;
 
             static Participant()
             {
-                _standard = 3;
+                _normative = 3;
             }
 
-            public string Surname
-            {
-                get => _surname ?? default;
-            }
-
-            public string Name
-            {
-                get => _name ?? default;
-            }
-
+       
+            public string Surname => _surname;
+            public string Name => _name;
             public double FirstJump => _firstJump;
             public double SecondJump => _secondJump;
-            public double BestJump => Math.Max(_firstJump, _secondJump);
-            public bool IsPassed => BestJump >= _standard;
+            public double BestJump => Math.Max(_firstJump, _secondJump); 
+            public bool IsPassed => BestJump >= _normative; 
+
 
             public Participant(string name, string surname)
             {
@@ -43,6 +40,7 @@ namespace Lab_7
                 _surname = surname;
                 _firstJump = 0;
                 _secondJump = 0;
+
             }
 
             public Participant(string name, string surname, double firstJump, double secondJump)
@@ -53,46 +51,72 @@ namespace Lab_7
                 _secondJump = secondJump;
             }
 
+
             public void Jump(double result)
             {
-                if (_firstJump == 0) _firstJump = result;
-                else if (_secondJump == 0) _secondJump = result;
+                if (_firstJump == 0)
+                {
+                    _firstJump = result;
+                }
+                else if (_secondJump == 0)
+                {
+                    _secondJump = result;
+                }
             }
 
+           
             public static Participant[] GetPassed(Participant[] participants)
-                => participants.Where(p => p.IsPassed).ToArray();
+            {
+                if (participants == null || participants.Length == 0) return new Participant[0];
+               
+                int count = 0;
+                for (int i = 0; i < participants.Length; i++)
+                {
+                    if (participants[i].IsPassed)
+                    {
+                        count++;
+                    }
+                }
+
+                Participant[] passedParticipants = new Participant[count];
+                int index = 0;
+                for (int i = 0; i < participants.Length; i++)
+                {
+                    if (participants[i].IsPassed)
+                    {
+                        passedParticipants[index++] = participants[i];
+                    }
+                }
+
+                return passedParticipants;
+            }
 
             public static void Sort(Participant[] array)
             {
                 if (array == null || array.Length == 0) return;
+                int n = array.Length;
+                bool sw;
 
-                for (int i = 0; i < array.Length - 1; i++)
+                for (int i = 0; i < n - 1; i++)
                 {
-                    bool swapped = false;
-                    for (int j = 0; j < array.Length - 1 - i; j++)
+                    sw = false;
+                    for (int j = 0; j < n - 1 - i; j++)
                     {
-                        if (array[j].BestJump < array[j + 1].BestJump)
+                        if (array[j].BestJump < array[j + 1].BestJump) 
                         {
                             (array[j], array[j + 1]) = (array[j + 1], array[j]);
-                            swapped = true;
+                            sw = true;
                         }
                     }
-                    if (!swapped) break;
+                    if (!sw) break; 
                 }
             }
 
             public void Print()
             {
-                Console.WriteLine(
-                    $"Имя: {_name}, " +
-                    $"Фамилия: {_surname}, " +
-                    $"Первый прыжок: {_firstJump}, " +
-                    $"Второй прыжок: {_secondJump}, " +
-                    $"Лучший прыжок: {BestJump}"
-                );
+                Console.WriteLine($"Имя: {_name}, Фамилия: {_surname}, Первый прыжок: {_firstJump}, Второй прыжок: {_secondJump}, Лучший прыжок: {BestJump}");
             }
         }
-    }
 
-   
+    }
 }
