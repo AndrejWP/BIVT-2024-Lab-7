@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+using System;
 
 namespace Lab_7
 {
@@ -11,101 +7,121 @@ namespace Lab_7
     {
         public class Student
         {
-            protected string _name;
-            protected string _surname;
+            // Поля
+            private string _name;
+            private string _surname;
             protected int[] _marks;
-            protected int _skipped;
+            protected int _skips;
 
-            public string Surname => _surname ?? default;
-            public string Name => _name ?? default;
+            // Свойства
+            public string Name => _name;
+            public string Surname => _surname;
+            public int Skipped => _skips;
+            public double AvgMark => (_marks != null && _marks.Length > 0) ? (double)_marks.Sum() / _marks.Length : 0;
 
-            public double AvgMark =>
-                (_marks == null || _marks.Length == 0)
-                ? 0
-                : (double)_marks.Sum() / _marks.Length;
-
-            public int Skipped => _skipped;
-
+            // Конструктор
             public Student(string name, string surname)
             {
                 _name = name;
                 _surname = surname;
-                _marks = Array.Empty<int>();
-                _skipped = 0;
+                _marks = new int[0];
+                _skips = 0;
             }
 
+            // Защищенный конструктор
             protected Student(Student student)
             {
                 _name = student._name;
                 _surname = student._surname;
-                _marks = student._marks.ToArray();
-                _skipped = student._skipped;
+                _marks = new int[student._marks.Length];
+                Array.Copy(student._marks, _marks, student._marks.Length);
+                _skips = student._skips;
             }
 
+            // Методы
             public void Lesson(int mark)
             {
-                if (mark == 0) _skipped++;
-                else _marks = [.. _marks, mark];
+                if (mark < 0)
+                {
+                    Console.WriteLine("Mark can't be negative");
+                    return;
+                }
+                else if (mark == 0)
+                {
+                    _skips += 1;
+                }
+                else
+                {
+                    if (_marks == null)
+                    {
+                        Console.WriteLine("Array of marks wasn't initialized");
+                        return;
+                    }
+
+                    var newArray = new int[_marks.Length + 1];
+                    Array.Copy(_marks, newArray, _marks.Length);
+                    newArray[_marks.Length] = mark;
+                    _marks = newArray;
+                }
             }
 
             public static void SortBySkipped(Student[] array)
             {
-                if (array == null || array.Length == 0) return;
-
-                for (int i = 0; i < array.Length - 1; i++)
+                if (array == null)
                 {
-                    bool swapped = false;
-                    for (int j = 0; j < array.Length - 1 - i; j++)
-                    {
-                        if (array[j].Skipped >= array[j + 1].Skipped) continue;
-
-                        (array[j], array[j + 1]) = (array[j + 1], array[j]);
-                        swapped = true;
-                    }
-                    if (!swapped) break;
+                    Console.WriteLine("Array can't be null");
+                    return;
                 }
+                if (array.Length == 0)
+                {
+                    Console.WriteLine("Array must not be empty");
+                    return;
+                }
+
+                var newArray = array.OrderByDescending(p => p.Skipped).ToArray();
+                Array.Copy(newArray, array, newArray.Length);
             }
 
             public virtual void Print()
             {
-                Console.WriteLine(
-                    $"Имя: {_name}, " +
-                    $"Фамилия: {_surname}, " +
-                    $"Средняя оценка: {AvgMark:F2}, " +
-                    $"Пропуски: {Skipped}"
-                );
+                Console.WriteLine("Name: " + Name + "\tSurname: " + Surname + "\tAverage mark: " + AvgMark + "\t Skipped: " + Skipped);
             }
         }
 
         public class Undergraduate : Student
         {
-            public Undergraduate(string name, string surname) : base(name, surname) { }
+            public Undergraduate(string name, string surname) : base(name, surname)
+            {
+            }
 
-            public Undergraduate(Student student) : base(student) { }
+            public Undergraduate(Student student) : base(student)
+            {
+            }
 
             public void WorkOff(int mark)
             {
-                if (_skipped > 0)
+                if (_skips > 0)
                 {
-                    _skipped--;
+                    _skips -= 1;
                     Lesson(mark);
-                    return;
                 }
-
-                int index = Array.IndexOf(_marks, 2);
-                if (index != -1) _marks[index] = mark;
+                else
+                {
+                    for (int i = 0; i < _marks.Length; ++i)
+                    {
+                        if (_marks[i] == 2)
+                        {
+                            _marks[i] = mark;
+                            return;
+                        }
+                    }
+                }
             }
 
             public override void Print()
             {
-                Console.WriteLine(
-                    $"Студент: {Name} {Surname}, " +
-                    $"Средняя оценка: {AvgMark:F2}, " +
-                    $"Пропуски: {Skipped}"
-                );
+                Console.WriteLine("Undergraduate's name: " + Name + "\tSurname: " + Surname + "\tAverage mark: " + AvgMark + "\t Skipped: " + Skipped);
             }
         }
     }
-
-
 }
